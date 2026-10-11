@@ -12,3 +12,13 @@ walk-forward trained (no lookahead). Output: expected return, P(up), 80% range, 
 
 Extend: add tickers/edges in `graph.py` (or pass your own `CausalGraph`), swap `news.extract_shocks` for an LLM/FinBERT classifier.
 Real validation needs a timestamped historical news CSV (`date,text[,ticker]`); the synthetic data only tests plumbing.
+
+## API
+
+    uvicorn stockpredict.api:app          # interactive docs at /docs
+    GET /stocks/{ticker}/prices?start=2025-01-01&end=2025-06-30&limit=250&indicators=true
+    GET /stocks/{ticker}/predict?horizon=5
+    GET /health
+
+Env: `STOCK_SOURCE=yfinance|synthetic`, `API_KEY` (require `X-API-Key` header), `CACHE_TTL` seconds.
+Responses include `source`; if live data can't be fetched the API falls back to `synthetic` and says so.
