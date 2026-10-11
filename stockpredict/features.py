@@ -21,7 +21,7 @@ def shock_state(news: list[Headline], dates: pd.DatetimeIndex, graph, halflife: 
             continue
         i = dates.searchsorted(h.ts.normalize(), side="left")
         if i < len(dates):
-            raw[i] += graph.shock_vector(extract_shocks(h.text))
+            raw[i] += graph.shock_vector(h.shocks if h.shocks is not None else extract_shocks(h.text))
     out = np.zeros_like(raw)
     acc = np.zeros(raw.shape[1])
     for t in range(len(dates)):

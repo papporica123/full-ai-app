@@ -13,8 +13,9 @@ def main():
     ap.add_argument("--ticker", default="XOM")
     ap.add_argument("--source", default="synthetic", choices=["synthetic", "yfinance", "csv"])
     ap.add_argument("--prices-csv")
-    ap.add_argument("--news", default="auto", choices=["auto", "none", "rss", "csv"])
+    ap.add_argument("--news", default="auto", choices=["auto", "none", "rss", "csv", "gdelt"])
     ap.add_argument("--news-csv")
+    ap.add_argument("--gdelt-project", help="Google Cloud project for BigQuery (or GDELT_PROJECT env)")
     ap.add_argument("--horizon", type=int, default=5)
     a = ap.parse_args()
 
@@ -29,6 +30,10 @@ def main():
         df = prices.load_csv(a.prices_csv)
     if a.news == "csv":
         news = load_news_csv(a.news_csv)
+    elif a.news == "gdelt":
+        from .gdelt import load_gdelt_headlines
+        news = load_gdelt_headlines(df.index[0], df.index[-1], project=a.gdelt_project)
+        print(f"loaded {len(news)} GDELT daily shock records")
     elif a.news == "rss" or (a.news == "auto" and a.source != "synthetic"):
         for q in WORLD_QUERIES:
             news += fetch_rss(q)

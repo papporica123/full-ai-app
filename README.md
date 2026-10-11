@@ -22,3 +22,16 @@ Real validation needs a timestamped historical news CSV (`date,text[,ticker]`); 
 
 Env: `STOCK_SOURCE=yfinance|synthetic`, `API_KEY` (require `X-API-Key` header), `CACHE_TTL` seconds.
 Responses include `source`; if live data can't be fetched the API falls back to `synthetic` and says so.
+
+## Historical news from GDELT (BigQuery)
+
+    pip install google-cloud-bigquery db-dtypes && gcloud auth application-default login
+    export GDELT_PROJECT=<your-gcp-project>
+    python -m stockpredict.gdelt --start 2023-01-01 --end 2025-12-31 --dry-run   # GB scanned - check first!
+    python -m stockpredict --ticker XOM --source yfinance --news gdelt
+
+Conflict nodes (middle_east, russia, taiwan) come from the GDELT events table (cheap); trade_war, inflation and
+banks_stress come from the GKG themes table (large - use `--no-gkg` or short ranges to limit cost; queries are capped at
+200 GB billed and cached in `.gdelt_cache/`). Daily values are z-scored against the trailing 90 days and applied with a
+1-day lag. GDELT has no price direction, so oil/rates/usd are not taken from it. Theme names in `gdelt.py` should be
+checked against your data.

@@ -56,6 +56,7 @@ class Headline:
     ts: pd.Timestamp
     text: str
     ticker: str | None = None  # set when the item is about a specific company
+    shocks: dict | None = None  # precomputed node shocks (e.g. from GDELT); skips text extraction
 
 
 def extract_shocks(text: str) -> dict:

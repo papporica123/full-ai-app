@@ -69,6 +69,13 @@ def _live_news(ticker: str):
                 out += fetch_rss(q, ticker if q.endswith("stock") else None)
             except Exception:
                 continue
+        if os.getenv("GDELT_PROJECT"):
+            try:
+                from .gdelt import load_gdelt_headlines
+                now = pd.Timestamp.today().normalize()
+                out += load_gdelt_headlines(now - pd.Timedelta(days=30), now)
+            except Exception:
+                pass  # GDELT is optional; RSS still works
         return out
     return _cached(("news", ticker), go)
 
